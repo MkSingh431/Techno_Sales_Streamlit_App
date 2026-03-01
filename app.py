@@ -7,59 +7,18 @@ import os
 import folium
 from streamlit_folium import st_folium
 
+st.set_page_config(page_title='Rossmann!!!',page_icon=':bar_chart',layout='wide')
+st.title('Rossmann Analysis Dashboard')
+st.markdown('<style>div.block-container{padding-top:2rem;}</style>',unsafe_allow_html=True)
 
-def set_background_color(color):
-    css = f"""
-    <style>
-    .stApp {{
-        background: {color};
-        background-attachment: fixed;
-    }}
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
 
-# 2. DO: Call the function only after it is defined
-set_background_color("white")
 
-# 3. REST OF APP:
-st.title("Techno Sales Analysis!!!")
-# 2. Your custom function (Local Namespace)
-def set_background_image(image_path):
-    with open(image_path, "rb") as f:
-        data = f.read()
-    base64_str = base64.b64encode(data).decode()
-    css = f"""
-    <style>
-    .stApp {{
-        background-image: url("data:image/jpg;base64,{base64_str}");
-        background-size: cover;
-    }}
-    /* Themed Title Styling */
-    .main-title {{
-        color: #228B22; /* Forest Green */
-        text-align: center;
-        font-size: 50px;
-        font-weight: bold;
-        text-shadow: 2px 2px 4px #000000; /* Shadow for readability on images */
-    }}
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
-
-# 3. Call the function correctly (No 'st.' prefix!)
-set_background_image("logo.jpg")
-
-# 4. Use the custom CSS class for your title
-# st.markdown('<h1 class="main-title">Techno Sales Analysis!!!</h1>', unsafe_allow_html=True)
 # import the data
 data=pd.read_csv('Complete_Techno_Sales_Data.csv')
 data['Order_Date'] = pd.to_datetime(data['Order_Date'], errors='coerce')
 data = data.dropna(subset=['Order_Date']).copy()
 data['Year'] = data['Order_Date'].dt.year
 
-# Apply white background
-set_background_color('white')
 
 if "status_filter" not in st.session_state:
     st.session_state["status_filter"] = []

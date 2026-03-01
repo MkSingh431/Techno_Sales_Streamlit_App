@@ -8,40 +8,50 @@ import folium
 from streamlit_folium import st_folium
 
 
-st.set_page_config(page_title='Techno Sales!!!', page_icon=':bar_chart', layout='wide')
-st.title('Techno Sales Analysis!!!')
-st.markdown('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
-
-def get_base64_of_bin_file(bin_file):
-        with open(bin_file, 'rb') as f:
-                data = f.read()
-        return base64.b64encode(data).decode()
-
-def set_background_image(image_path):
-        base64_str = get_base64_of_bin_file(image_path)
-        css = f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/jpg;base64,{base64_str}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }}
-        </style>
-        """
-        st.markdown(css, unsafe_allow_html=True)
-
 def set_background_color(color):
-        css = f"""
-        <style>
-        .stApp {{
-            background: {color};
-            background-attachment: fixed;
-        }}
-        </style>
-        """
-        st.markdown(css, unsafe_allow_html=True)
+    css = f"""
+    <style>
+    .stApp {{
+        background: {color};
+        background-attachment: fixed;
+    }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
 
+# 2. DO: Call the function only after it is defined
+set_background_color("white")
+
+# 3. REST OF APP:
+st.title("Techno Sales Analysis!!!")
+# 2. Your custom function (Local Namespace)
+def set_background_image(image_path):
+    with open(image_path, "rb") as f:
+        data = f.read()
+    base64_str = base64.b64encode(data).decode()
+    css = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/jpg;base64,{base64_str}");
+        background-size: cover;
+    }}
+    /* Themed Title Styling */
+    .main-title {{
+        color: #228B22; /* Forest Green */
+        text-align: center;
+        font-size: 50px;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px #000000; /* Shadow for readability on images */
+    }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+# 3. Call the function correctly (No 'st.' prefix!)
+set_background_image("logo.jpg")
+
+# 4. Use the custom CSS class for your title
+# st.markdown('<h1 class="main-title">Techno Sales Analysis!!!</h1>', unsafe_allow_html=True)
 # import the data
 data=pd.read_csv('Complete_Techno_Sales_Data.csv')
 data['Order_Date'] = pd.to_datetime(data['Order_Date'], errors='coerce')
@@ -91,6 +101,11 @@ with st.sidebar:
     st.subheader("Select Brands")
     brand_options = sorted(data['Brand'].dropna().unique())
     brand = st.multiselect('Brand', brand_options, key="brand_filter")
+    
+    st.subheader("Follow Mk Singh")
+    st.markdown("[LinkedIn](http://www.linkedin.com/in/motilal-das-42b4a9254)")
+    st.markdown("[GitHub](https://github.com/MkSingh431)")
+    
 
     st.button("Clear All Filters", use_container_width=True, on_click=clear_all_filters)
 
@@ -638,3 +653,46 @@ with t_col:
     
 st.divider()
 
+st.markdown("### Project Conclusion")
+
+if filtered_data.empty:
+    st.info("No data available for the selected filters.")
+else:
+    total_sales_summary = filtered_data["Total_Sales"].sum()
+    total_profit_summary = filtered_data["Total_Profit"].sum()
+    total_cost_summary = filtered_data["Total_Cost"].sum()
+    profit_margin_summary = (
+        (total_profit_summary / total_sales_summary) * 100 if total_sales_summary else 0
+    )
+
+    top_category = (
+        filtered_data.groupby("Category")["Total_Sales"].sum().sort_values(ascending=False).index[0]
+    )
+    top_brand = (
+        filtered_data.groupby("Brand")["Total_Sales"].sum().sort_values(ascending=False).index[0]
+    )
+    top_supervisor = (
+        filtered_data.groupby("Assigned Supervisor")["Total_Sales"]
+        .sum()
+        .sort_values(ascending=False)
+        .index[0]
+    )
+    top_state_code = (
+        filtered_data.groupby("State_Code")["Total_Sales"].sum().sort_values(ascending=False).index[0]
+    )
+    top_state_name = state_mapping.get(top_state_code, top_state_code)
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Conclusion Total Sales", f"${total_sales_summary:,.2f}")
+    c2.metric("Conclusion Total Profit", f"${total_profit_summary:,.2f}")
+    c3.metric("Profit Margin", f"{profit_margin_summary:.2f}%")
+
+    st.markdown(
+        f"""
+- **Top Category by Sales:** {top_category}  
+- **Top Brand by Sales:** {top_brand}  
+- **Top State by Sales:** {top_state_name} ({top_state_code})  
+- **Top Supervisor by Sales:** {top_supervisor}  
+- **Total Cost:** ${total_cost_summary:,.2f}
+"""
+    )

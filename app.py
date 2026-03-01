@@ -59,23 +59,15 @@ if "year_filter" not in st.session_state:
     st.session_state["year_filter"] = []
 if "brand_filter" not in st.session_state:
     st.session_state["brand_filter"] = []
-if "pending_supervisor" not in st.session_state:
-    st.session_state["pending_supervisor"] = None
-if "clear_filters_requested" not in st.session_state:
-    st.session_state["clear_filters_requested"] = False
 
-# Apply pending actions before widgets are created
-if st.session_state["clear_filters_requested"]:
+def clear_all_filters():
     st.session_state["status_filter"] = []
     st.session_state["supervisor_filter"] = []
     st.session_state["year_filter"] = []
     st.session_state["brand_filter"] = []
-    st.session_state["pending_supervisor"] = None
-    st.session_state["clear_filters_requested"] = False
 
-if st.session_state["pending_supervisor"]:
-    st.session_state["supervisor_filter"] = [st.session_state["pending_supervisor"]]
-    st.session_state["pending_supervisor"] = None
+def select_supervisor(supervisor_name):
+    st.session_state["supervisor_filter"] = [supervisor_name]
 
 # Initial Sidebar setup
 with st.sidebar:
@@ -100,9 +92,7 @@ with st.sidebar:
     brand_options = sorted(data['Brand'].dropna().unique())
     brand = st.multiselect('Brand', brand_options, key="brand_filter")
 
-    if st.button("Clear All Filters", use_container_width=True):
-        st.session_state["clear_filters_requested"] = True
-        st.rerun()
+    st.button("Clear All Filters", use_container_width=True, on_click=clear_all_filters)
 
 filtered_data = data.copy()
 if status:
@@ -207,9 +197,13 @@ for col, card in zip([col1, col2, col3, col4, col5, col6], supervisor_cards):
                 st.write("Image not found")
 
             button_key = f"supervisor_btn_{card['name'].replace(' ', '_')}"
-            if st.button(card["name"], key=button_key, use_container_width=True):
-                st.session_state["pending_supervisor"] = card["name"]
-                st.rerun()
+            st.button(
+                card["name"],
+                key=button_key,
+                use_container_width=True,
+                on_click=select_supervisor,
+                args=(card["name"],),
+            )
 
             if card["name"] in st.session_state.get("supervisor_filter", []):
                 st.caption("Selected")

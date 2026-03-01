@@ -48,8 +48,8 @@ data['Order_Date'] = pd.to_datetime(data['Order_Date'], errors='coerce')
 data = data.dropna(subset=['Order_Date']).copy()
 data['Year'] = data['Order_Date'].dt.year
 
-# Apply background: use a solid color background from the theme
-set_background_color('mintCream')
+# Apply white background
+set_background_color('white')
 
 if "status_filter" not in st.session_state:
     st.session_state["status_filter"] = []

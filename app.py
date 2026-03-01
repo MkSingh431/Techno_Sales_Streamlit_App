@@ -7,8 +7,8 @@ import os
 import folium
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title='Rossmann!!!',page_icon=':bar_chart',layout='wide')
-st.title('Rossmann Analysis Dashboard')
+st.set_page_config(page_title='Techno Sales!!!',page_icon=':bar_chart',layout='wide')
+st.title('Techno Analysis Dashboard')
 st.markdown('<style>div.block-container{padding-top:2rem;}</style>',unsafe_allow_html=True)
 
 
